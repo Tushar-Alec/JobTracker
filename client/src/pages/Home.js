@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import JobForm from '../components/JobForm';
 import JobList from '../components/JobList';
+
 import { getJobs, addJob, deleteJob, updateJob } from '../services/api';
 
 const Home = () => {
@@ -38,13 +39,23 @@ const Home = () => {
     return index < states.length - 1 ? states[index + 1] : states[0];
   };
 
-  return (
-    <div>
-      <h2>Job Tracker</h2>
-      <JobForm onAddJob={handleAddJob} />
-      <JobList jobs={jobs} onDelete={handleDeleteJob} onUpdate={handleUpdateStatus} />
+  
+    
+    return (
+  <div className="App">
+    <div className="navbar">
+      <h1>Job Tracker</h1>
+      <div>
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="">Sign Up</a>
+      </div>
     </div>
-  );
+
+    <JobForm onAddJob={handleAddJob} />
+    <JobList jobs={jobs} onDelete={handleDeleteJob} onUpdate={handleUpdateStatus} />
+  </div>
+);
 };
 
 export default Home;
