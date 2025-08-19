@@ -10,7 +10,8 @@ function JobList({ jobs, onDelete, onUpdate }) {
 
           <div className="job-actions">
             <button onClick={() => onUpdate(job)}>Edit</button>
-            <button onClick={() => onDelete(job)}>Delete</button>
+            <button  onClick={() => onDelete(job)}> Delete </button>
+
           </div>
         </div>
       ))}

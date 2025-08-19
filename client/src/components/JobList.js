@@ -10,8 +10,8 @@ const JobList = ({ jobs, onDelete, onUpdate }) => {
           <p><strong>Company:</strong> {job.company}</p>
           <p><strong>Status:</strong> {job.status}</p>
 
-          <button onClick={() => onUpdate(job.id, job.status)}>Update Status</button>
-          <button onClick={() => onDelete(job.id)}>Delete</button>
+          <button className="edit-btn" onClick={() => onUpdate(job.id, job.status)}>Update Status</button>
+          <button className="delete-btn" onClick={() => onDelete(job.id)}>Delete</button>
         </div>
       ))}
     </div>
