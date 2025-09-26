@@ -4,21 +4,27 @@ const cors = require('cors');
 const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 
-const app = express();
+const authMiddleware = require('./middleware/auth');
+const jobRoutes = require('./routes/jobs');
+const authRoutes = require('./routes/auth');
+
+const app = express(); // ✅ initialize early
 const PORT = 5000;
 
-app.use(cors());
+// Middleware
+app.use(cors({
+  origin: ["http://localhost:5173", "http://localhost:3000"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
 app.use(bodyParser.json());
 
+// DB connection
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME
-  });
-
-app.get('/', (req, res) => {
-  res.send('Welcome to the Job Tracker API!');
 });
 
 db.connect(err => {
@@ -26,48 +32,19 @@ db.connect(err => {
     console.error('DB connection failed:', err);
     return;
   }
-  console.log('Connected to MySQL DB');
+  console.log('✅ Connected to MySQL DB');
 });
 
-// API route to insert job
-app.post('/api/jobs', (req, res) => {
-  const { title, company, status } = req.body;
-
-  const query = 'INSERT INTO jobs (title, company, status) VALUES (?, ?, ?)';
-  db.query(query, [title, company, status], (err, result) => {
-    if (err) {
-      console.error('Error inserting job:', err);
-      return res.status(500).json({ error: 'Failed to insert job' });
-    }
-    res.status(201).json({ message: 'Job inserted successfully' });
-  });
+// Health check
+app.get('/', (req, res) => {
+  res.send('Welcome to the Job Tracker API!');
 });
 
+// Routes
+app.use('/api/auth', authRoutes); 
+app.use('/api/jobs', authMiddleware, jobRoutes); // ✅ protected jobs route
+
+// Start server
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
-
-// GET all jobs
-app.get('/api/jobs', (req, res) => {
-  db.query('SELECT * FROM jobs', (err, results) => {
-    if (err) return res.status(500).json({ error: 'Failed to fetch jobs' });
-    res.json(results);
-  });
-});
-
-// DELETE job
-app.delete('/api/jobs/:id', (req, res) => {
-  db.query('DELETE FROM jobs WHERE id = ?', [req.params.id], (err) => {
-    if (err) return res.status(500).json({ error: 'Failed to delete job' });
-    res.json({ message: 'Job deleted successfully' });
-  });
-});
-
-// UPDATE job status
-app.put('/api/jobs/:id', (req, res) => {
-  const { status } = req.body;
-  db.query('UPDATE jobs SET status = ? WHERE id = ?', [status, req.params.id], (err) => {
-    if (err) return res.status(500).json({ error: 'Failed to update job' });
-    res.json({ message: 'Job updated successfully' });
-  });
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });

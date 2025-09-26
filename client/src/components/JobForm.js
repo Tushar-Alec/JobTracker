@@ -3,7 +3,7 @@ import React, { useState } from "react";
 
 const JobForm = ({ onAddJob }) => {
   const [formData, setFormData] = useState({
-    title: "",
+    title: "",     // ✅ changed role -> title
     company: "",
     status: "applied",
   });
@@ -15,9 +15,9 @@ const JobForm = ({ onAddJob }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (onAddJob) {
-      onAddJob(formData); // ✅ Only send to Home
+      onAddJob(formData);
     }
-    setFormData({ title: "", company: "", status: "applied" });
+    setFormData({ title: "", company: "", status: "applied" }); // ✅ reset correctly
   };
 
   return (

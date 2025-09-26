@@ -1,21 +1,43 @@
-// src/services/api.js
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/jobs';
+// Create axios instance with backend base URL
+const api = axios.create({
+  baseURL: 'http://localhost:5000',
+});
 
-export const getJobs = async () => {
-  const response = await axios.get(API_URL);
-  return response.data;
-};
+// 🔐 Automatically attach token to every request
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+}, (error) => {
+  return Promise.reject(error);
+});
 
-export const addJob = async (jobData) => {
-  return await axios.post(API_URL, jobData);
-};
+// =======================
+// Auth APIs
+// =======================
+export const signup = (payload) =>
+  api.post('/api/auth/signup', payload).then((res) => res.data);
 
-export const deleteJob = async (id) => {
-  return await axios.delete(`${API_URL}/${id}`);
-};
+export const login = (payload) =>
+  api.post('/api/auth/login', payload).then((res) => res.data);
 
-export const updateJob = async (id, updatedData) => {
-  return await axios.put(`${API_URL}/${id}`, updatedData);
-};
+// =======================
+// Job APIs
+// =======================
+export const getJobs = () =>
+  api.get('/api/jobs').then((res) => res.data);
+
+export const addJob = (job) =>
+  api.post('/api/jobs', job).then((res) => res.data);
+
+export const deleteJob = (id) =>
+  api.delete(`/api/jobs/${id}`).then((res) => res.data);
+
+export const updateJob = (id, payload) =>
+  api.patch(`/api/jobs/${id}`, payload).then((res) => res.data);
+
+export default api;
